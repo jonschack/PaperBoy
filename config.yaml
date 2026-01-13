@@ -1,0 +1,13 @@
+user_name: "Dr. Researcher"
+interests:
+  - "Artificial Intelligence"
+  - "Machine Learning"
+  - "Large Language Models"
+  - "DevOps"
+delivery_mode: "markdown" # Options: 'email' or 'markdown'
+sources:
+  - name: "Hacker News"
+    url: "https://news.ycombinator.com/rss"
+  - name: "arXiv AI"
+    url: "http://export.arxiv.org/rss/cs.AI"
+persona: "Act as a Senior Principal Investigator preparing a succinct lab meeting brief. Focus on high-impact developments and novel architectures. Ignore generic tutorials."
