@@ -1,0 +1,6 @@
+feedparser
+google-generativeai
+jinja2
+pyyaml
+python-dotenv
+markdown

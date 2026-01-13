@@ -1,0 +1,18 @@
+user_name: "Researcher"
+interests:
+  - "Artificial Intelligence"
+  - "Machine Learning"
+  - "Large Language Models"
+delivery_mode: "markdown" # options: 'email', 'markdown'
+email_config:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender_email: "your_email@gmail.com" # Requires EMAIL_PASSWORD secret
+    recipient_email: "recipient@example.com"
+sources:
+  - name: "OpenAI Blog"
+    url: "https://openai.com/blog/rss.xml"
+  - name: "Google AI Blog"
+    url: "http://googleaiblog.blogspot.com/atom.xml"
+  - name: "arXiv AI"
+    url: "http://export.arxiv.org/rss/cs.AI"

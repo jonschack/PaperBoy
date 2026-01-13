@@ -1,0 +1,1 @@
+Digest {{ date }} - {{ summary }}
