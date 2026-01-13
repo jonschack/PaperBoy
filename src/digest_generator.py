@@ -27,8 +27,9 @@ class DigestGenerator:
             import markdown
             html_content = markdown.markdown(summary_text)
         except ImportError:
-            # Fallback if markdown library not available
-            html_content = f"<pre>{summary_text}</pre>"
+            # Fallback: convert newlines to <br> for basic formatting
+            html_content = summary_text.replace('\n\n', '</p><p>').replace('\n', '<br>')
+            html_content = f"<p>{html_content}</p>"
 
         return template.render(
             date=date_str,

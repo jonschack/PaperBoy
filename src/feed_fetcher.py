@@ -34,7 +34,7 @@ class FeedFetcher:
 
                         if published_dt >= cutoff_date:
                             entry['source_name'] = source['name']
-                            entry['published_dt'] = published_dt # Store for later use
+                            entry['published_dt'] = published_dt  # Store for later use
                             all_entries.append(entry)
             except Exception as e:
                 print(f"Failed to fetch {source['name']}: {e}")

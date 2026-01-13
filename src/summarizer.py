@@ -27,14 +27,19 @@ class Summarizer:
             title = entry.get('title', 'No Title')
             source = entry.get('source_name', 'Unknown Source')
             link = entry.get('link', '#')
-            # Use summary or content, truncate if too long
+            # Use summary or content, truncate at word boundary if too long
             content = entry.get('summary') or entry.get('description') or "No content available."
+            
+            # Truncate at word boundary to avoid cutting mid-word
+            max_length = 2000
+            if len(content) > max_length:
+                content = content[:max_length].rsplit(' ', 1)[0] + '...'
 
             articles_text += f"\n\n--- Article {i} ---\n"
             articles_text += f"Title: {title}\n"
             articles_text += f"Source: {source}\n"
             articles_text += f"Link: {link}\n"
-            articles_text += f"Content Snippet: {content[:2000]}...\n"
+            articles_text += f"Content Snippet: {content}\n"
 
         prompt = f"""
         {persona}
