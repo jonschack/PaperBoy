@@ -11,7 +11,7 @@
 ## ✨ Features
 
 - **🔄 Automated Sync** - GitHub Action runs nightly to import new papers
-- **🤖 AI Summaries** - GPT-4o-mini generates key findings, methodology, and implications
+- **🤖 AI Summaries** - Gemini 1.5 Flash generates key findings, methodology, and implications
 - **📄 Beautiful Pages** - Clean Notion pages with TL;DR callouts and organized sections
 - **🔗 PDF Links** - Direct links to ScienceDirect PDFs
 - **📊 State Tracking** - Never imports duplicates
@@ -29,7 +29,7 @@ Click the **Fork** button at the top right.
 | Elsevier API | [dev.elsevier.com](https://dev.elsevier.com/) — register and create an API key |
 | Elsevier Author ID | Find your Scopus Author ID at [scopus.com](https://www.scopus.com/) |
 | Notion | [notion.so/my-integrations](https://www.notion.so/my-integrations) — create an integration |
-| OpenAI | [platform.openai.com](https://platform.openai.com/) |
+| Google AI | [aistudio.google.com](https://aistudio.google.com/) — get a free API key |
 
 ### 3. Set up Notion
 
@@ -47,7 +47,7 @@ Go to your fork → Settings → Secrets and variables → Actions → New repos
 | `ELSEVIER_AUTHOR_ID` | Your Scopus Author ID |
 | `NOTION_TOKEN` | Notion integration token |
 | `NOTION_PARENT_PAGE_ID` | ID of the Notion page |
-| `OPENAI_API_KEY` | OpenAI API key |
+| `GEMINI_API_KEY` | Google AI (Gemini) API key |
 
 ### 5. Run it!
 
@@ -81,7 +81,7 @@ npm run sync -- --doi=10.1016/your.paper.doi
 ├── src/
 │   ├── index.ts        # Main orchestrator
 │   ├── elsevier.ts     # Elsevier API client
-│   ├── summarizer.ts   # OpenAI summarization
+│   ├── summarizer.ts   # Gemini summarization
 │   ├── notion.ts       # Notion page creation
 │   ├── state.ts        # Import tracking
 │   └── types.ts        # TypeScript interfaces
@@ -110,8 +110,8 @@ Each imported paper creates a page with:
 | `ELSEVIER_AUTHOR_ID` | ✅ | - | Scopus Author ID |
 | `NOTION_TOKEN` | ✅ | - | Notion integration token |
 | `NOTION_PARENT_PAGE_ID` | ✅ | - | Target page for imports |
-| `OPENAI_API_KEY` | ✅ | - | OpenAI API key |
-| `OPENAI_MODEL` | ❌ | `gpt-4o-mini` | Model for summaries |
+| `GEMINI_API_KEY` | ✅ | - | Google AI (Gemini) API key |
+| `GEMINI_MODEL` | ❌ | `gemini-1.5-flash` | Model for summaries |
 
 ## 🤝 Contributing
 

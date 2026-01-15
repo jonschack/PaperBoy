@@ -1,5 +1,5 @@
 /**
- * AI-powered paper summarization using OpenAI
+ * AI-powered paper summarization using Google Gemini
  */
 import type { Paper, PaperSummary } from './types.js';
 /**
@@ -11,10 +11,10 @@ export declare function buildSummaryPrompt(paper: Paper, fullText: string): stri
  */
 export declare function parseSummaryResponse(response: string): PaperSummary;
 /**
- * AI summarizer using OpenAI
+ * AI summarizer using Google Gemini
  */
 export declare class Summarizer {
-    private client;
+    private genAI;
     private model;
     constructor(apiKey: string, model?: string);
     /**

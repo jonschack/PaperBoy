@@ -32,7 +32,7 @@ export interface Config {
         token: string;
         parentPageId: string;
     };
-    openai: {
+    gemini: {
         apiKey: string;
         model: string;
     };

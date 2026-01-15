@@ -25,8 +25,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@notionhq/client": "^2.2.14",
-    "openai": "^4.28.0"
+    "@google/generative-ai": "^0.21.0",
+    "@notionhq/client": "^2.2.14"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

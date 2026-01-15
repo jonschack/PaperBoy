@@ -30,9 +30,9 @@ function loadConfig() {
             token: required('NOTION_TOKEN'),
             parentPageId: required('NOTION_PARENT_PAGE_ID'),
         },
-        openai: {
-            apiKey: required('OPENAI_API_KEY'),
-            model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        gemini: {
+            apiKey: required('GEMINI_API_KEY'),
+            model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
         },
         dryRun: process.argv.includes('--dry-run'),
         singleDoi: process.argv.find((arg) => arg.startsWith('--doi='))?.split('=')[1],
@@ -75,7 +75,7 @@ async function main() {
     }
     // Initialize clients
     const elsevier = new ElsevierClient(config.elsevier.apiKey);
-    const summarizer = new Summarizer(config.openai.apiKey, config.openai.model);
+    const summarizer = new Summarizer(config.gemini.apiKey, config.gemini.model);
     const notion = new NotionClient(config.notion.token);
     // Load state
     let state = await loadState(STATE_FILE);
