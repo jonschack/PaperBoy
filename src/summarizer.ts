@@ -83,11 +83,14 @@ export class Summarizer {
         const userPrompt = buildSummaryPrompt(paper, fullText);
 
         try {
-            const model = this.genAI.getGenerativeModel({ model: this.model });
+            const model = this.genAI.getGenerativeModel({
+                model: this.model,
+                systemInstruction: SYSTEM_PROMPT,
+            });
             const response = await model.generateContent({
                 contents: [{
                     role: 'user',
-                    parts: [{ text: `${SYSTEM_PROMPT}\n\n${userPrompt}` }],
+                    parts: [{ text: userPrompt }],
                 }],
                 generationConfig: {
                     temperature: 0.3, // Lower for more consistent output
