@@ -1,6 +1,63 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NotionClient, buildPaperPageContent } from '../src/notion.js';
+import { NotionClient, buildPaperPageContent, normalizeNotionPageId } from '../src/notion.js';
 import type { Paper, PaperSummary } from '../src/types.js';
+
+describe('normalizeNotionPageId', () => {
+    const validUuid = '12345678-1234-1234-1234-123456789012';
+    const compactUuid = '12345678123412341234123456789012';
+
+    it('should return UUID unchanged if already in correct format', () => {
+        expect(normalizeNotionPageId(validUuid)).toBe(validUuid);
+    });
+
+    it('should convert compact UUID to standard format', () => {
+        expect(normalizeNotionPageId(compactUuid)).toBe(validUuid);
+    });
+
+    it('should handle UUID with surrounding quotes', () => {
+        expect(normalizeNotionPageId(`"${validUuid}"`)).toBe(validUuid);
+        expect(normalizeNotionPageId(`'${validUuid}'`)).toBe(validUuid);
+    });
+
+    it('should handle UUID with surrounding whitespace', () => {
+        expect(normalizeNotionPageId(`  ${validUuid}  `)).toBe(validUuid);
+    });
+
+    it('should extract UUID from Notion URL with page title', () => {
+        const url = `https://www.notion.so/workspace/My-Page-Title-${compactUuid}`;
+        expect(normalizeNotionPageId(url)).toBe(validUuid);
+    });
+
+    it('should extract UUID from Notion URL without page title', () => {
+        const url = `https://notion.so/${compactUuid}`;
+        expect(normalizeNotionPageId(url)).toBe(validUuid);
+    });
+
+    it('should extract UUID from Notion URL with query parameters', () => {
+        const url = `https://www.notion.so/Page-${compactUuid}?v=abc123`;
+        expect(normalizeNotionPageId(url)).toBe(validUuid);
+    });
+
+    it('should handle lowercase hex characters', () => {
+        const lowercase = 'abcdef78abcdabcdabcdabcdef789012';
+        expect(normalizeNotionPageId(lowercase)).toBe('abcdef78-abcd-abcd-abcd-abcdef789012');
+    });
+
+    it('should handle uppercase hex characters', () => {
+        const uppercase = 'ABCDEF78ABCDABCDABCDABCDEF789012';
+        expect(normalizeNotionPageId(uppercase)).toBe('ABCDEF78-ABCD-ABCD-ABCD-ABCDEF789012');
+    });
+
+    it('should throw error for invalid input', () => {
+        expect(() => normalizeNotionPageId('not-a-uuid')).toThrow('Invalid Notion page ID');
+        expect(() => normalizeNotionPageId('')).toThrow('Invalid Notion page ID');
+        expect(() => normalizeNotionPageId('123')).toThrow('Invalid Notion page ID');
+    });
+
+    it('should throw error for UUID with wrong length', () => {
+        expect(() => normalizeNotionPageId('12345678-1234-1234-1234')).toThrow('Invalid Notion page ID');
+    });
+});
 
 describe('NotionClient', () => {
     const mockPaper: Paper = {
@@ -71,6 +128,7 @@ describe('NotionClient', () => {
     describe('NotionClient.createPaperPage', () => {
         let client: NotionClient;
         let mockCreate: ReturnType<typeof vi.fn>;
+        const testParentPageId = '12345678-1234-1234-1234-123456789012';
 
         beforeEach(() => {
             mockCreate = vi.fn().mockResolvedValue({ id: 'page-123' });
@@ -82,11 +140,11 @@ describe('NotionClient', () => {
         });
 
         it('should create page under parent with correct properties', async () => {
-            await client.createPaperPage('parent-page-id', mockPaper, mockSummary);
+            await client.createPaperPage(testParentPageId, mockPaper, mockSummary);
 
             expect(mockCreate).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    parent: { page_id: 'parent-page-id' },
+                    parent: { page_id: testParentPageId },
                     properties: expect.objectContaining({
                         title: expect.any(Object),
                     }),
@@ -96,8 +154,19 @@ describe('NotionClient', () => {
         });
 
         it('should return created page ID', async () => {
-            const pageId = await client.createPaperPage('parent-page-id', mockPaper, mockSummary);
+            const pageId = await client.createPaperPage(testParentPageId, mockPaper, mockSummary);
             expect(pageId).toBe('page-123');
+        });
+
+        it('should normalize compact UUID to standard format', async () => {
+            const compactId = '12345678123412341234123456789012';
+            await client.createPaperPage(compactId, mockPaper, mockSummary);
+
+            expect(mockCreate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parent: { page_id: testParentPageId },
+                })
+            );
         });
     });
 });
