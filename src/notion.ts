@@ -201,8 +201,8 @@ export function buildPaperPageContent(paper: Paper, summary: PaperSummary): Bloc
         });
     }
 
-    // Original Abstract
-    if (paper.abstract) {
+    // Original Abstract (only show if there's actual content)
+    if (paper.abstract && paper.abstract.trim()) {
         blocks.push({ type: 'divider', divider: {} });
 
         blocks.push({
