@@ -50,7 +50,7 @@ function loadConfig(): Config {
         },
         gemini: {
             apiKey: required('GEMINI_API_KEY'),
-            model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+            model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
         },
         dryRun: process.argv.includes('--dry-run'),
         singleDoi: process.argv.find((arg) => arg.startsWith('--doi='))?.split('=')[1],

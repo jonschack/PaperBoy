@@ -89,7 +89,7 @@ describe('Summarizer', () => {
 
         beforeEach(() => {
             mockGenerateContent = vi.fn();
-            summarizer = new Summarizer('test-key', 'gemini-1.5-flash');
+            summarizer = new Summarizer('test-key', 'gemini-2.5-flash-lite');
             // @ts-expect-error - mocking private genAI
             summarizer.genAI = {
                 getGenerativeModel: () => ({
