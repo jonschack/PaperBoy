@@ -12,8 +12,9 @@
 import { ElsevierClient } from './elsevier.js';
 import { Summarizer } from './summarizer.js';
 import { NotionClient } from './notion.js';
-import { loadState, saveState, filterNewPapers, markImported } from './state.js';
-import type { Config, ImportState, Paper } from './types.js';
+import { StateManager } from './state.js';
+import { PaperImportService } from './import-service.js';
+import type { Config, Paper } from './types.js';
 
 const STATE_FILE = './import-state.json';
 
@@ -44,47 +45,6 @@ function loadConfig(): Config {
     };
 }
 
-async function importPaper(
-    paper: Paper,
-    elsevier: ElsevierClient,
-    summarizer: Summarizer,
-    notion: NotionClient,
-    config: Config
-): Promise<void> {
-    console.log(`\n📄 Processing: ${paper.title}`);
-    console.log(`   DOI: ${paper.doi}`);
-
-    // Fetch full text for better summary
-    console.log('   ⏳ Fetching full text...');
-    const fullText = await elsevier.getFullText(paper.doi);
-
-    // If no full text, get abstract
-    if (!fullText && !paper.abstract) {
-        console.log('   ⏳ Fetching abstract...');
-        paper.abstract = await elsevier.getAbstract(paper.doi);
-    }
-
-    // Generate AI summary
-    console.log('   🤖 Generating AI summary...');
-    const summary = await summarizer.summarize(paper, fullText);
-    console.log(`   💡 TL;DR: ${summary.tldr}`);
-
-    if (config.dryRun) {
-        console.log('   🏃 DRY RUN - would create Notion page');
-        console.log('   Summary:', JSON.stringify(summary, null, 2));
-        return;
-    }
-
-    // Create Notion page
-    console.log('   📝 Creating Notion page...');
-    const pageId = await notion.createPaperPage(
-        config.notion.parentPageId,
-        paper,
-        summary
-    );
-    console.log(`   ✅ Created page: ${pageId}`);
-}
-
 async function main(): Promise<void> {
     console.log('🚀 Elsevier-to-Notion Paper Importer');
     console.log('====================================\n');
@@ -101,10 +61,15 @@ async function main(): Promise<void> {
     const elsevier = new ElsevierClient(config.elsevier.apiKey);
     const summarizer = new Summarizer(config.gemini.apiKey, config.gemini.model);
     const notion = new NotionClient(config.notion.token);
+    const stateManager = new StateManager(STATE_FILE);
+    const importService = new PaperImportService(elsevier, summarizer, notion, {
+        parentPageId: config.notion.parentPageId,
+        dryRun: config.dryRun
+    });
 
     // Load state
-    let state = await loadState(STATE_FILE);
-    console.log(`📊 Previously imported: ${state.importedDois.length} papers`);
+    await stateManager.load();
+    console.log(`📊 Previously imported: ${stateManager.importedCount} papers`);
 
     // Fetch papers
     let papers: Paper[];
@@ -129,7 +94,7 @@ async function main(): Promise<void> {
     }
 
     // Filter new papers
-    const newPapers = filterNewPapers(papers, state);
+    const newPapers = stateManager.filterNewPapers(papers);
     console.log(`   New papers to import: ${newPapers.length}`);
 
     if (newPapers.length === 0) {
@@ -140,12 +105,12 @@ async function main(): Promise<void> {
     // Process each paper
     for (const paper of newPapers) {
         try {
-            await importPaper(paper, elsevier, summarizer, notion, config);
+            await importService.processPaper(paper);
 
             // Update state
-            state = markImported(state, paper.doi);
+            stateManager.markImported(paper.doi);
             if (!config.dryRun) {
-                await saveState(STATE_FILE, state);
+                await stateManager.save();
             }
         } catch (error) {
             console.error(`   ❌ Failed to import ${paper.doi}:`, error);
