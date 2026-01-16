@@ -144,7 +144,7 @@ export class ElsevierClient {
         
         // Calculate date 24 hours ago in YYYYMMDD format for ORIG-LOAD-DATE
         const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 15);
+        yesterday.setDate(yesterday.getDate() - 5);
         const dateStr = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
         
         // Search for papers from specified journals loaded in the last 24 hours
