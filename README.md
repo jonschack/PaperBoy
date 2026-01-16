@@ -1,6 +1,6 @@
 # Elsevier-to-Notion Paper Importer
 
-[![Sync Papers](https://github.com/jonschack/elsevier-to-notion/actions/workflows/sync.yml/badge.svg)](https://github.com/YOUR_USERNAME/elsevier-to-notion/actions/workflows/sync.yml)
+[![Sync Papers](https://github.com/jonschack/PaperBoy/actions/workflows/sync.yml/badge.svg)](https://github.com/YOUR_USERNAME/elsevier-to-notion/actions/workflows/sync.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 
