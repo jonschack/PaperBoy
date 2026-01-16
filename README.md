@@ -11,7 +11,7 @@
 ## ✨ Features
 
 - **🔄 Automated Sync** - GitHub Action runs nightly to import new papers
-- **🤖 AI Summaries** - Gemini 1.5 Flash generates key findings, methodology, and implications
+- **🤖 AI Summaries** - Gemini 2.5 Flash Lite generates key findings, methodology, and implications
 - **📄 Beautiful Pages** - Clean Notion pages with TL;DR callouts and organized sections
 - **🔗 PDF Links** - Direct links to ScienceDirect PDFs
 - **📊 State Tracking** - Never imports duplicates
@@ -110,7 +110,7 @@ Each imported paper creates a page with:
 | `NOTION_TOKEN` | ✅ | - | Notion integration token |
 | `NOTION_PARENT_PAGE_ID` | ✅ | - | Target page for imports |
 | `GEMINI_API_KEY` | ✅ | - | Google AI (Gemini) API key |
-| `GEMINI_MODEL` | ❌ | `gemini-1.5-flash` | Model for summaries |
+| `GEMINI_MODEL` | ❌ | `gemini-2.5-flash-lite` | Model for summaries |
 
 ## 🤝 Contributing
 
