@@ -1,0 +1,64 @@
+name: Sync Elsevier Papers to Notion
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # Allow manual triggers
+    inputs:
+      dry_run:
+        description: 'Run without creating Notion pages'
+        required: false
+        default: 'false'
+        type: boolean
+      single_doi:
+        description: 'Import a specific DOI only (for testing)'
+        required: false
+        type: string
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run import
+        env:
+          ELSEVIER_API_KEY: ${{ secrets.ELSEVIER_API_KEY }}
+          ELSEVIER_JOURNALS: ${{ secrets.ELSEVIER_JOURNALS }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ -n "${{ inputs.single_doi }}" ]; then
+            ARGS="$ARGS --doi=${{ inputs.single_doi }}"
+          fi
+          node dist/index.js $ARGS
+
+      - name: Commit state changes
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add import-state.json
+          git diff --staged --quiet || git commit -m "chore: update import state [skip ci]"
+          git push
