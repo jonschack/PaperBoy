@@ -26,7 +26,7 @@ export interface PaperSummary {
 export interface Config {
     elsevier: {
         apiKey: string;
-        authorId: string;
+        journals: string[];
     };
     notion: {
         token: string;

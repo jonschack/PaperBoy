@@ -1,7 +1,7 @@
 /**
  * Elsevier API client for fetching scientific papers
  * 
- * Uses the Scopus Search API for finding papers by author
+ * Uses the Scopus Search API for finding papers by journal names
  * and the ScienceDirect Full-Text API for retrieving content.
  */
 
@@ -136,13 +136,19 @@ export class ElsevierClient {
     }
 
     /**
-     * Search for papers by author ID
+     * Search for papers by journal names from the last 24 hours
      */
-    async searchAuthorPapers(authorId: string, startDate?: string): Promise<Paper[]> {
-        let query = `AU-ID(${authorId})`;
-        if (startDate) {
-            query += ` AND PUBYEAR > ${startDate.slice(0, 4)}`;
-        }
+    async searchJournalPapers(journals: string[]): Promise<Paper[]> {
+        // Build query for multiple journals using OR
+        const journalQueries = journals.map(j => `SRCTITLE("${j}")`).join(' OR ');
+        
+        // Calculate date 24 hours ago in YYYYMMDD format for ORIG-LOAD-DATE
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dateStr = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
+        
+        // Search for papers from specified journals loaded in the last 24 hours
+        const query = `(${journalQueries}) AND ORIG-LOAD-DATE AFT ${dateStr}`;
 
         const url = `${SCOPUS_SEARCH_URL}?query=${encodeURIComponent(query)}&sort=coverDate`;
         const response = await this.request<ElsevierSearchResponse>(url);
