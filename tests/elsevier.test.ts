@@ -112,7 +112,7 @@ describe('ElsevierClient', () => {
         });
     });
 
-    describe('ElsevierClient.searchAuthorPapers', () => {
+    describe('ElsevierClient.searchJournalPapers', () => {
         let client: ElsevierClient;
         let mockFetch: ReturnType<typeof vi.fn>;
 
@@ -122,7 +122,7 @@ describe('ElsevierClient', () => {
             client = new ElsevierClient('test-api-key');
         });
 
-        it('should call Scopus API with correct parameters', async () => {
+        it('should call Scopus API with correct journal query parameters', async () => {
             mockFetch.mockResolvedValueOnce({
                 ok: true,
                 json: () => Promise.resolve({
@@ -130,7 +130,8 @@ describe('ElsevierClient', () => {
                 })
             });
 
-            await client.searchAuthorPapers('12345678');
+            const journals = ['NeuroImage', 'Progress in Neurobiology'];
+            await client.searchJournalPapers(journals);
 
             expect(mockFetch).toHaveBeenCalledWith(
                 expect.stringContaining('api.elsevier.com/content/search/scopus'),
@@ -140,6 +141,13 @@ describe('ElsevierClient', () => {
                     })
                 })
             );
+
+            // Verify the query includes journal names
+            const calledUrl = mockFetch.mock.calls[0][0];
+            expect(calledUrl).toContain('SRCTITLE');
+            expect(calledUrl).toContain(encodeURIComponent('NeuroImage'));
+            expect(calledUrl).toContain(encodeURIComponent('Progress in Neurobiology'));
+            expect(calledUrl).toContain('ORIG-LOAD-DATE');
         });
 
         it('should throw on API error', async () => {
@@ -149,7 +157,7 @@ describe('ElsevierClient', () => {
                 statusText: 'Unauthorized'
             });
 
-            await expect(client.searchAuthorPapers('12345678'))
+            await expect(client.searchJournalPapers(['NeuroImage']))
                 .rejects.toThrow('Elsevier API error: 401 Unauthorized');
         });
     });

@@ -27,7 +27,6 @@ Click the **Fork** button at the top right.
 | Service | Where to Get |
 |---------|--------------|
 | Elsevier API | [dev.elsevier.com](https://dev.elsevier.com/) — register and create an API key |
-| Elsevier Author ID | Find your Scopus Author ID at [scopus.com](https://www.scopus.com/) |
 | Notion | [notion.so/my-integrations](https://www.notion.so/my-integrations) — create an integration |
 | Google AI | [aistudio.google.com](https://aistudio.google.com/) — get a free API key |
 
@@ -44,10 +43,10 @@ Go to your fork → Settings → Secrets and variables → Actions → New repos
 | Secret Name | Description |
 |-------------|-------------|
 | `ELSEVIER_API_KEY` | Your Elsevier API key |
-| `ELSEVIER_AUTHOR_ID` | Your Scopus Author ID |
 | `NOTION_TOKEN` | Notion integration token |
 | `NOTION_PARENT_PAGE_ID` | ID of the Notion page |
 | `GEMINI_API_KEY` | Google AI (Gemini) API key |
+| `ELSEVIER_JOURNALS` | (Optional) Comma-separated list of journal names to search |
 
 ### 5. Run it!
 
@@ -107,7 +106,7 @@ Each imported paper creates a page with:
 | Environment Variable | Required | Default | Description |
 |---------------------|----------|---------|-------------|
 | `ELSEVIER_API_KEY` | ✅ | - | Elsevier API key |
-| `ELSEVIER_AUTHOR_ID` | ✅ | - | Scopus Author ID |
+| `ELSEVIER_JOURNALS` | ❌ | NeuroImage, Progress in Neurobiology, Biological Psychiatry: Cognitive Neuroscience and Neuroimaging | Comma-separated list of journal names to search |
 | `NOTION_TOKEN` | ✅ | - | Notion integration token |
 | `NOTION_PARENT_PAGE_ID` | ✅ | - | Target page for imports |
 | `GEMINI_API_KEY` | ✅ | - | Google AI (Gemini) API key |

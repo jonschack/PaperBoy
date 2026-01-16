@@ -2,7 +2,7 @@
  * Elsevier-to-Notion Paper Importer
  * 
  * Main entry point - orchestrates the import pipeline:
- * 1. Fetch papers from Elsevier by author ID
+ * 1. Fetch papers from Elsevier by journal names (last 24 hours)
  * 2. Filter out already-imported papers
  * 3. Generate AI summaries for new papers
  * 4. Create Notion pages with content
@@ -17,6 +17,13 @@ import type { Config, ImportState, Paper } from './types.js';
 
 const STATE_FILE = './import-state.json';
 
+// Default journals to search for
+const DEFAULT_JOURNALS = [
+    'NeuroImage',
+    'Progress in Neurobiology',
+    'Biological Psychiatry: Cognitive Neuroscience and Neuroimaging',
+];
+
 function loadConfig(): Config {
     const required = (name: string): string => {
         const value = process.env[name];
@@ -26,10 +33,16 @@ function loadConfig(): Config {
         return value;
     };
 
+    // Parse journals from environment variable or use defaults
+    const journalsEnv = process.env.ELSEVIER_JOURNALS;
+    const journals = journalsEnv
+        ? journalsEnv.split(',').map((j) => j.trim())
+        : DEFAULT_JOURNALS;
+
     return {
         elsevier: {
             apiKey: required('ELSEVIER_API_KEY'),
-            authorId: required('ELSEVIER_AUTHOR_ID'),
+            journals,
         },
         notion: {
             token: required('NOTION_TOKEN'),
@@ -91,7 +104,7 @@ async function main(): Promise<void> {
 
     // Load configuration
     const config = loadConfig();
-    console.log(`📋 Author ID: ${config.elsevier.authorId}`);
+    console.log(`📋 Journals: ${config.elsevier.journals.join(', ')}`);
     console.log(`📋 Dry run: ${config.dryRun}`);
     if (config.singleDoi) {
         console.log(`📋 Single DOI mode: ${config.singleDoi}`);
@@ -122,9 +135,9 @@ async function main(): Promise<void> {
             fullText,
         }];
     } else {
-        // Normal mode - search by author
-        console.log('\n🔍 Searching for papers...');
-        papers = await elsevier.searchAuthorPapers(config.elsevier.authorId);
+        // Normal mode - search by journals (last 24 hours)
+        console.log('\n🔍 Searching for papers from the last 24 hours...');
+        papers = await elsevier.searchJournalPapers(config.elsevier.journals);
         console.log(`   Found ${papers.length} papers`);
     }
 
