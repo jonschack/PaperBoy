@@ -71,7 +71,7 @@ export class Summarizer {
     private genAI: GoogleGenerativeAI;
     private model: string;
 
-    constructor(apiKey: string, model: string = 'gemini-1.5-flash') {
+    constructor(apiKey: string, model: string = 'gemini-2.5-flash-lite') {
         this.genAI = new GoogleGenerativeAI(apiKey);
         this.model = model;
     }
