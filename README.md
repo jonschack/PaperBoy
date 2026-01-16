@@ -1,4 +1,4 @@
-# Elsevier-to-Notion Paper Importer
+# PaperBoy: Elsevier-to-Notion Paper Importer
 
 [![Sync Papers](https://github.com/jonschack/PaperBoy/actions/workflows/sync.yml/badge.svg)](https://github.com/YOUR_USERNAME/elsevier-to-notion/actions/workflows/sync.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
