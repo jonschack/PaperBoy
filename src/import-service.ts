@@ -8,6 +8,12 @@ export interface ImportConfig {
     dryRun: boolean;
 }
 
+/**
+ * Handles the core business logic of processing a paper.
+ * 
+ * Orchestrates fetching full text/abstract from Elsevier, generating AI summaries
+ * using the Summarizer, and creating Notion pages with the processed content.
+ */
 export class PaperImportService {
     constructor(
         private elsevier: ElsevierClient,
@@ -25,14 +31,15 @@ export class PaperImportService {
         const fullText = await this.elsevier.getFullText(paper.doi);
 
         // If no full text, get abstract
-        if (!fullText && !paper.abstract) {
+        let abstract = paper.abstract;
+        if (!fullText && !abstract) {
             console.log('   ⏳ Fetching abstract...');
-            paper.abstract = await this.elsevier.getAbstract(paper.doi);
+            abstract = await this.elsevier.getAbstract(paper.doi);
         }
 
         // Generate AI summary
         console.log('   🤖 Generating AI summary...');
-        const summary = await this.summarizer.summarize(paper, fullText);
+        const summary = await this.summarizer.summarize({ ...paper, abstract }, fullText);
         console.log(`   💡 TL;DR: ${summary.tldr}`);
 
         if (this.config.dryRun) {
@@ -45,7 +52,7 @@ export class PaperImportService {
         console.log('   📝 Creating Notion page...');
         const pageId = await this.notion.createPaperPage(
             this.config.parentPageId,
-            paper,
+            { ...paper, abstract },
             summary
         );
         console.log(`   ✅ Created page: ${pageId}`);

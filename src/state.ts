@@ -6,6 +6,12 @@ const DEFAULT_STATE: ImportState = {
     lastRun: '',
 };
 
+/**
+ * Manages the state of imported papers to prevent duplicates.
+ * 
+ * Tracks imported papers via their DOIs stored in a JSON file. This enables
+ * the import process to skip papers that have already been imported in previous runs.
+ */
 export class StateManager {
     private state: ImportState = { ...DEFAULT_STATE };
     private filePath: string;
@@ -36,7 +42,9 @@ export class StateManager {
     }
 
     markImported(doi: string): void {
-        this.state.importedDois.push(doi);
+        if (!this.state.importedDois.includes(doi)) {
+            this.state.importedDois.push(doi);
+        }
         this.state.lastRun = new Date().toISOString();
     }
 

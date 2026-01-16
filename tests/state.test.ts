@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { StateManager } from '../src/state.js';
-import { writeFile, readFile, unlink } from 'fs/promises';
+import { unlink } from 'fs/promises';
 import { join } from 'path';
 
 describe('StateManager', () => {
@@ -32,6 +32,7 @@ describe('StateManager', () => {
 
     it('should filter new papers', async () => {
         const manager = new StateManager(TEST_STATE_FILE);
+        await manager.load();
         manager.markImported('existing-doi');
 
         const papers = [
