@@ -4,7 +4,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 
-> 🔬 Automatically import your Elsevier/ScienceDirect papers into Notion with AI-generated summaries.
+> 🔬 Automatically import your favorite journals' Elsevier/ScienceDirect papers into Notion with AI-generated summaries.
 
 ## ✨ Features
 
