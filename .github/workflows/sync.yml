@@ -1,0 +1,72 @@
+# Sync Elsevier Papers to Notion
+# 
+# This workflow automatically syncs papers from specified journals
+# to your Notion workspace with AI-generated summaries.
+#
+# Runs nightly at 6 AM UTC and can be triggered manually.
+# Uses journal-based search (not author ID) per recent changes.
+
+name: Sync Elsevier Papers to Notion
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run without making Notion changes'
+        required: false
+        default: 'false'
+        type: boolean
+      single_doi:
+        description: 'Import a single paper by DOI (optional)'
+        required: false
+        type: string
+
+jobs:
+  sync:
+    name: Sync Papers
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Sync papers to Notion
+        env:
+          ELSEVIER_API_KEY: ${{ secrets.ELSEVIER_API_KEY }}
+          ELSEVIER_JOURNALS: ${{ secrets.ELSEVIER_JOURNALS }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ -n "${{ github.event.inputs.single_doi }}" ]; then
+            ARGS="$ARGS --doi=${{ github.event.inputs.single_doi }}"
+          fi
+          npm run start -- $ARGS
+
+      - name: Commit state changes
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add import-state.json
+          git diff --staged --quiet || git commit -m "Update import state [skip ci]"
+          git push
