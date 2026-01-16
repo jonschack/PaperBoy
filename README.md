@@ -1,12 +1,10 @@
 # Elsevier-to-Notion Paper Importer
 
-[![Sync Papers](https://github.com/YOUR_USERNAME/elsevier-to-notion/actions/workflows/sync.yml/badge.svg)](https://github.com/YOUR_USERNAME/elsevier-to-notion/actions/workflows/sync.yml)
+[![Sync Papers](https://github.com/jonschack/elsevier-to-notion/actions/workflows/sync.yml/badge.svg)](https://github.com/YOUR_USERNAME/elsevier-to-notion/actions/workflows/sync.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 
 > 🔬 Automatically import your Elsevier/ScienceDirect papers into Notion with AI-generated summaries.
-
-![Demo](https://via.placeholder.com/800x400.png?text=Notion+Page+Screenshot)
 
 ## ✨ Features
 
@@ -52,27 +50,17 @@ Go to your fork → Settings → Secrets and variables → Actions → New repos
 
 Go to Actions → "Sync Elsevier Papers to Notion" → Run workflow
 
-## 🧪 Local Development
+## 🎨 Notion Page Format
 
-```bash
-# Clone and install
-git clone https://github.com/YOUR_USERNAME/elsevier-to-notion
-cd elsevier-to-notion
-npm install
+Each imported paper creates a page with:
 
-# Set up environment
-cp .env.example .env
-# Edit .env with your keys
-
-# Run tests
-npm test
-
-# Dry run (no Notion changes)
-npm run sync -- --dry-run
-
-# Import a single paper
-npm run sync -- --doi=10.1016/your.paper.doi
-```
+- 💡 **TL;DR** - One-sentence summary in a callout
+- 📖 **Paper Details** - Journal, authors, date, DOI link
+- 📄 **PDF Link** - Direct link to ScienceDirect
+- 🎯 **Key Findings** - Bullet points of main discoveries
+- 🔬 **Methodology** - Research methods summary
+- 💥 **Implications** - Real-world impact
+- 📝 **Original Abstract** - Collapsible toggle
 
 ## 📁 Project Structure
 
@@ -88,18 +76,6 @@ npm run sync -- --doi=10.1016/your.paper.doi
 ├── .github/workflows/  # GitHub Actions
 └── import-state.json   # Tracks imported papers
 ```
-
-## 🎨 Notion Page Format
-
-Each imported paper creates a page with:
-
-- 💡 **TL;DR** - One-sentence summary in a callout
-- 📖 **Paper Details** - Journal, authors, date, DOI link
-- 📄 **PDF Link** - Direct link to ScienceDirect
-- 🎯 **Key Findings** - Bullet points of main discoveries
-- 🔬 **Methodology** - Research methods summary
-- 💥 **Implications** - Real-world impact
-- 📝 **Original Abstract** - Collapsible toggle
 
 ## ⚙️ Configuration
 
