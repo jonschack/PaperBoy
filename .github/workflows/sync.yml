@@ -1,14 +1,14 @@
 # Sync Elsevier Papers to Notion
-# 
+#
 # This workflow automatically syncs papers from specified journals
 # to your Notion workspace with AI-generated summaries.
 #
 # Runs nightly at 6 AM UTC and can be triggered manually.
 # Uses journal-based search (not author ID) per recent changes.
-
+---
 name: Sync Elsevier Papers to Notion
 
-on:
+"on":
   schedule:
     # Run daily at 6:00 AM UTC
     - cron: '0 6 * * *'
@@ -28,7 +28,7 @@ jobs:
   sync:
     name: Sync Papers
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,10 +63,15 @@ jobs:
           npm run start -- $ARGS
 
       - name: Commit state changes
-        if: github.event.inputs.dry_run != 'true'
+        if: >-
+          github.event_name == 'schedule' ||
+          github.event.inputs.dry_run != true
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add import-state.json
-          git diff --staged --quiet || git commit -m "Update import state [skip ci]"
-          git push
+          git config --local user.email "actions@github.com"
+          git config --local user.name "github-actions"
+          if [ -f import-state.json ]; then
+            git add import-state.json
+            git diff --staged --quiet || \
+              git commit -m "Update import state [skip ci]"
+            git push
+          fi
