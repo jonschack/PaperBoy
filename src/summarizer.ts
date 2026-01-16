@@ -1,8 +1,8 @@
 /**
- * AI-powered paper summarization using OpenAI
+ * AI-powered paper summarization using Google Gemini
  */
 
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { Paper, PaperSummary } from './types.js';
 
 const SYSTEM_PROMPT = `You are a scientific paper summarizer. Given a paper's metadata and content, 
@@ -65,14 +65,14 @@ export function parseSummaryResponse(response: string): PaperSummary {
 }
 
 /**
- * AI summarizer using OpenAI
+ * AI summarizer using Google Gemini
  */
 export class Summarizer {
-    private client: OpenAI;
+    private genAI: GoogleGenerativeAI;
     private model: string;
 
-    constructor(apiKey: string, model: string = 'gpt-4o-mini') {
-        this.client = new OpenAI({ apiKey });
+    constructor(apiKey: string, model: string = 'gemini-1.5-flash') {
+        this.genAI = new GoogleGenerativeAI(apiKey);
         this.model = model;
     }
 
@@ -83,17 +83,22 @@ export class Summarizer {
         const userPrompt = buildSummaryPrompt(paper, fullText);
 
         try {
-            const response = await this.client.chat.completions.create({
+            const model = this.genAI.getGenerativeModel({
                 model: this.model,
-                messages: [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    { role: 'user', content: userPrompt },
-                ],
-                temperature: 0.3, // Lower for more consistent output
-                max_tokens: 1000,
+                systemInstruction: SYSTEM_PROMPT,
+            });
+            const response = await model.generateContent({
+                contents: [{
+                    role: 'user',
+                    parts: [{ text: userPrompt }],
+                }],
+                generationConfig: {
+                    temperature: 0.3, // Lower for more consistent output
+                    maxOutputTokens: 1000,
+                },
             });
 
-            const content = response.choices[0]?.message?.content || '';
+            const content = response.response.text() || '';
             return parseSummaryResponse(content);
         } catch (error) {
             console.error('Summarization failed:', error);

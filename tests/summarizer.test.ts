@@ -85,33 +85,29 @@ describe('Summarizer', () => {
 
     describe('Summarizer.summarize', () => {
         let summarizer: Summarizer;
-        let mockCreate: ReturnType<typeof vi.fn>;
+        let mockGenerateContent: ReturnType<typeof vi.fn>;
 
         beforeEach(() => {
-            mockCreate = vi.fn();
-            summarizer = new Summarizer('test-key', 'gpt-4o-mini');
-            // @ts-expect-error - mocking private client
-            summarizer.client = {
-                chat: {
-                    completions: {
-                        create: mockCreate,
-                    },
-                },
+            mockGenerateContent = vi.fn();
+            summarizer = new Summarizer('test-key', 'gemini-1.5-flash');
+            // @ts-expect-error - mocking private genAI
+            summarizer.genAI = {
+                getGenerativeModel: () => ({
+                    generateContent: mockGenerateContent,
+                }),
             };
         });
 
-        it('should call OpenAI API with correct parameters', async () => {
-            mockCreate.mockResolvedValueOnce({
-                choices: [{
-                    message: {
-                        content: JSON.stringify({
-                            keyFindings: ['Finding'],
-                            methodology: 'Method',
-                            implications: 'Impact',
-                            tldr: 'Summary',
-                        }),
-                    },
-                }],
+        it('should call Gemini API with correct parameters', async () => {
+            mockGenerateContent.mockResolvedValueOnce({
+                response: {
+                    text: () => JSON.stringify({
+                        keyFindings: ['Finding'],
+                        methodology: 'Method',
+                        implications: 'Impact',
+                        tldr: 'Summary',
+                    }),
+                },
             });
 
             const paper: Paper = {
@@ -125,11 +121,9 @@ describe('Summarizer', () => {
 
             const summary = await summarizer.summarize(paper, 'Full text content');
 
-            expect(mockCreate).toHaveBeenCalledWith(
+            expect(mockGenerateContent).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    model: 'gpt-4o-mini',
-                    messages: expect.arrayContaining([
-                        expect.objectContaining({ role: 'system' }),
+                    contents: expect.arrayContaining([
                         expect.objectContaining({ role: 'user' }),
                     ]),
                 })
