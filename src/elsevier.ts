@@ -1,7 +1,7 @@
 /**
  * Elsevier API client for fetching scientific papers
  * 
- * Uses the Scopus Search API for finding papers by author
+ * Uses the Scopus Search API for finding papers by journal names
  * and the ScienceDirect Full-Text API for retrieving content.
  */
 
