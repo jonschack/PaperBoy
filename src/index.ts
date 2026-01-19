@@ -79,8 +79,8 @@ async function importPaper(
     console.log('   ⏳ Fetching full text...');
     const fullText = await elsevier.getFullText(paper.doi);
 
-    // If no full text, get abstract
-    if (!fullText && !paper.abstract) {
+    // If no full text and no abstract (or empty abstract), get abstract
+    if (!fullText && (!paper.abstract || !paper.abstract.trim())) {
         console.log('   ⏳ Fetching abstract...');
         paper.abstract = await elsevier.getAbstract(paper.doi);
     }
