@@ -38,6 +38,7 @@ export interface Config {
     };
     dryRun: boolean;
     singleDoi?: string;
+    lookbackDays: number;
 }
 
 /** State tracking imported papers */

@@ -160,5 +160,48 @@ describe('ElsevierClient', () => {
             await expect(client.searchJournalPapers(['NeuroImage']))
                 .rejects.toThrow('Elsevier API error: 401 Unauthorized');
         });
+
+        it('should use lookbackDays parameter to calculate date filter', async () => {
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve({
+                    'search-results': { entry: [] }
+                })
+            });
+
+            const journals = ['NeuroImage'];
+            const lookbackDays = 7;
+            
+            // Calculate expected date (7 days ago)
+            const expectedDate = new Date();
+            expectedDate.setDate(expectedDate.getDate() - lookbackDays);
+            const expectedDateStr = expectedDate.toISOString().slice(0, 10).replace(/-/g, '');
+            
+            await client.searchJournalPapers(journals, lookbackDays);
+
+            const calledUrl = mockFetch.mock.calls[0][0];
+            expect(calledUrl).toContain(`ORIG-LOAD-DATE%20AFT%20${expectedDateStr}`);
+        });
+
+        it('should default to 1 day lookback when lookbackDays is not provided', async () => {
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve({
+                    'search-results': { entry: [] }
+                })
+            });
+
+            const journals = ['NeuroImage'];
+            
+            // Calculate expected date (1 day ago - default)
+            const expectedDate = new Date();
+            expectedDate.setDate(expectedDate.getDate() - 1);
+            const expectedDateStr = expectedDate.toISOString().slice(0, 10).replace(/-/g, '');
+            
+            await client.searchJournalPapers(journals);
+
+            const calledUrl = mockFetch.mock.calls[0][0];
+            expect(calledUrl).toContain(`ORIG-LOAD-DATE%20AFT%20${expectedDateStr}`);
+        });
     });
 });
