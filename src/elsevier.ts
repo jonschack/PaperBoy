@@ -136,18 +136,18 @@ export class ElsevierClient {
     }
 
     /**
-     * Search for papers by journal names from the last 24 hours
+     * Search for papers by journal names from the specified lookback period
      */
-    async searchJournalPapers(journals: string[]): Promise<Paper[]> {
+    async searchJournalPapers(journals: string[], lookbackDays: number = 1): Promise<Paper[]> {
         // Build query for multiple journals using OR
         const journalQueries = journals.map(j => `SRCTITLE("${j}")`).join(' OR ');
         
-        // Calculate date 24 hours ago in YYYYMMDD format for ORIG-LOAD-DATE
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const dateStr = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
+        // Calculate date N days ago in YYYYMMDD format for ORIG-LOAD-DATE
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - lookbackDays);
+        const dateStr = pastDate.toISOString().slice(0, 10).replace(/-/g, '');
         
-        // Search for papers from specified journals loaded in the last 24 hours
+        // Search for papers from specified journals loaded in the lookback period
         const query = `(${journalQueries}) AND ORIG-LOAD-DATE AFT ${dateStr}`;
 
         const url = `${SCOPUS_SEARCH_URL}?query=${encodeURIComponent(query)}&sort=coverDate`;

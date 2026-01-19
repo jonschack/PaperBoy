@@ -16,6 +16,11 @@ on:
         description: 'Import a specific DOI only (for testing)'
         required: false
         type: string
+      lookback_days:
+        description: 'Number of days to look back for papers'
+        required: false
+        default: '1'
+        type: string
 
 jobs:
   sync:
@@ -44,6 +49,7 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LOOKBACK_DAYS: ${{ inputs.lookback_days || '1' }}
         run: |
           ARGS=""
           if [ "${{ inputs.dry_run }}" = "true" ]; then

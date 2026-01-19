@@ -39,6 +39,13 @@ function loadConfig(): Config {
         ? journalsEnv.split(',').map((j) => j.trim())
         : DEFAULT_JOURNALS;
 
+    // Parse lookback days from environment variable or use default of 1
+    const lookbackDaysEnv = process.env.LOOKBACK_DAYS;
+    const lookbackDays = lookbackDaysEnv ? parseInt(lookbackDaysEnv, 10) : 1;
+    if (isNaN(lookbackDays) || lookbackDays < 1) {
+        throw new Error('LOOKBACK_DAYS must be a positive integer');
+    }
+
     return {
         elsevier: {
             apiKey: required('ELSEVIER_API_KEY'),
@@ -54,6 +61,7 @@ function loadConfig(): Config {
         },
         dryRun: process.argv.includes('--dry-run'),
         singleDoi: process.argv.find((arg) => arg.startsWith('--doi='))?.split('=')[1],
+        lookbackDays,
     };
 }
 
@@ -105,6 +113,7 @@ async function main(): Promise<void> {
     // Load configuration
     const config = loadConfig();
     console.log(`📋 Journals: ${config.elsevier.journals.join(', ')}`);
+    console.log(`📋 Lookback days: ${config.lookbackDays}`);
     console.log(`📋 Dry run: ${config.dryRun}`);
     if (config.singleDoi) {
         console.log(`📋 Single DOI mode: ${config.singleDoi}`);
@@ -135,9 +144,9 @@ async function main(): Promise<void> {
             fullText,
         }];
     } else {
-        // Normal mode - search by journals (last 24 hours)
-        console.log('\n🔍 Searching for papers from the last 24 hours...');
-        papers = await elsevier.searchJournalPapers(config.elsevier.journals);
+        // Normal mode - search by journals (using lookback days)
+        console.log(`\n🔍 Searching for papers from the last ${config.lookbackDays} day(s)...`);
+        papers = await elsevier.searchJournalPapers(config.elsevier.journals, config.lookbackDays);
         console.log(`   Found ${papers.length} papers`);
     }
 
